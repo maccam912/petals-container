@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import logging
 
 
-model_name = "meta-llama/Llama-2-70b-hf"
+model_name = "meta-llama/Llama-2-70b-chat-hf"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoDistributedModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float32)
 
@@ -68,16 +68,15 @@ class Delta(BaseModel):
 
 
 def create_prompt(messages: List[Message]) -> str:
-    prompt = ""
+    prompt = "[INST]"
     for m in messages:
-    #     if m.role == "user":
-    #         prompt += "\n" + m.content
-    #     elif m.role == "assistant":
-    #         prompt += "### Response:" + "\n" + m.content + "\n"
-    #     elif m.role == "system":
-    #         prompt += " <<SYS>>" + "\n" + m.content + "\n<</SYS>>\n"
-    # prompt += "[/INST]"
-        prompt += m.content + "\n"
+        if m.role == "user":
+            prompt += "\n" + m.content
+        elif m.role == "assistant":
+            prompt += "[/INST]" + m.content + "\n[INST]"
+        elif m.role == "system":
+            prompt += " <<SYS>>\n" + m.content + "\n<</SYS>>\n"
+    prompt += "[/INST]"
     return prompt
 
 
