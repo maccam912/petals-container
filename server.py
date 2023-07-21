@@ -1,8 +1,6 @@
 from transformers import AutoTokenizer
 import torch
 from petals import AutoDistributedModelForCausalLM
-import asyncio
-from litestar.response import Stream
 from typing import List, Literal
 from litestar import Litestar
 from litestar import Controller, post
@@ -10,7 +8,7 @@ from pydantic import BaseModel
 import logging
 
 
-model_name = "meta-llama/Llama-2-70b-chat-hf"
+model_name = "meta-llama/Llama-2-70b-hf"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoDistributedModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float32)
 
@@ -72,13 +70,14 @@ class Delta(BaseModel):
 def create_prompt(messages: List[Message]) -> str:
     prompt = ""
     for m in messages:
-        if m.role == "user":
-            prompt += "### User:" + "\n" + m.content + "\n"
-        elif m.role == "assistant":
-            prompt += "### Response:" + "\n" + m.content + "\n"
-        elif m.role == "system":
-            prompt += "### System:" + "\n" + m.content + "\n"
-    prompt += "### Response:\n"
+    #     if m.role == "user":
+    #         prompt += "\n" + m.content
+    #     elif m.role == "assistant":
+    #         prompt += "### Response:" + "\n" + m.content + "\n"
+    #     elif m.role == "system":
+    #         prompt += " <<SYS>>" + "\n" + m.content + "\n<</SYS>>\n"
+    # prompt += "[/INST]"
+        prompt += m.content + "\n"
     return prompt
 
 
@@ -113,6 +112,7 @@ class PetalsController(Controller):
         logger.info("Generated response")
         resp_str = tokenizer.decode(outputs[0])
         logger.info("Decoded tokens: " + resp_str)
+        resp_str = resp_str.replace(prompt, "")
         resp = create_response(resp_str)
         logger.info("Resp: " + str(resp))
         return resp
