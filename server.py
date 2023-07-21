@@ -118,13 +118,13 @@ class PetalsController(Controller):
         logger.info("In run")
         logger.info("Got request")
         prompt = create_prompt(data.messages)
-        logger.info("created prompt")
+        logger.info("created prompt: " + prompt) 
         inputs = tokenizer(prompt, return_tensors="pt")["input_ids"]
         logger.info("tokenized prompt, generating response...")
         outputs = model.generate(inputs, max_new_tokens=512)
         logger.info("Generated response")
         resp_str = tokenizer.decode(outputs[0])
-        logger.info("Decoded tokens")
+        logger.info("Decoded tokens: " + resp_str)
         return create_response(resp_str)
 
 
