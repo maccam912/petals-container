@@ -1,0 +1,15 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Matt Koski", email = "maccam912@gmail.com"},
+]
+dependencies = [
+    "litestar>=2.0.0b2",
+    "uvicorn>=0.22.0",
+    "pydantic>=1.10.11",
+    "petals>=2",
+]
+requires-python = ">=3.10,<3.11"
+license = {text = "MIT"}
