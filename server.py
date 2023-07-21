@@ -98,23 +98,11 @@ def create_response(result: str) -> Response:
     )
     return response
 
-
-def create_role_or_content(result: str) -> Role | Content:
-    # if result.startswith("### Response:"):
-    #     return Role(role="assistant")
-    # elif result.startswith("### System:"):
-    #     return Role(role="system")
-    # elif result.startswith("### User:"):
-    #     return Role(role="user")
-    # else:
-    return Content(content=result)
-
-
 class PetalsController(Controller):
     path = "/v1/chat/completions"
 
     @post()
-    async def run(self, data: Request) -> Stream:
+    async def run(self, data: Request) -> Response:
         logger.info("In run")
         logger.info("Got request")
         prompt = create_prompt(data.messages)
@@ -125,7 +113,9 @@ class PetalsController(Controller):
         logger.info("Generated response")
         resp_str = tokenizer.decode(outputs[0])
         logger.info("Decoded tokens: " + resp_str)
-        return create_response(resp_str)
+        resp = create_response(resp_str)
+        logger.info("Resp: " + str(resp))
+        return resp
 
 
 app = Litestar(route_handlers=[PetalsController])
