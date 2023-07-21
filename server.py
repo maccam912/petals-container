@@ -11,7 +11,7 @@ import logging
 
 model_name = "meta-llama/Llama-2-70b-hf"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoDistributedModelForCausalLM.from_pretrained(model_name)
+model = AutoDistributedModelForCausalLM.from_pretrained(model_name, torch_dtype='float32')
 
 logger = logging.getLogger(__name__)
 
