@@ -122,12 +122,12 @@ def create_chat_response(result: str) -> ChatResponse:
     )
     return response
 
-def create_response(result: str) -> CompletionsResponse:
+def create_response(result: str, model: str = "foo") -> CompletionsResponse:
     response = CompletionsResponse(
         id="",
         object="",
         created=0,
-        model="",
+        model=model,
         choices=[Content(content=result)],
         usage=Usage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
     )
@@ -160,13 +160,14 @@ class PetalsController(Controller):
     async def run(self, data: CompletionsRequest) -> ChatResponse:
         logger.info("In completions run")
         logger.info("Got request")
+        logger.info(data.json())
         prompt = data.prompt
         inputs = tokenizer(prompt, return_tensors="pt")["input_ids"]
         logger.info("tokenized prompt, generating response...")
         outputs = model.generate(inputs, max_new_tokens=512)
         logger.info("Generated response")
         resp_str = tokenizer.decode(outputs[0])
-        resp = create_response(resp_str)
+        resp = create_response(resp_str, data['model'])
         logger.info("Resp: " + str(resp))
         return resp
 
