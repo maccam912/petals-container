@@ -2,8 +2,7 @@ from transformers import AutoTokenizer
 import torch
 from petals import AutoDistributedModelForCausalLM
 from typing import List, Literal
-from litestar import Litestar
-from litestar import Controller, post
+from litestar import Litestar, Controller, WebSocket, post, websocket
 from pydantic import BaseModel
 import logging
 
@@ -116,5 +115,14 @@ class PetalsController(Controller):
         logger.info("Resp: " + str(resp))
         return resp
 
+@websocket("/ide/ws")
+async def wss(socket: WebSocket) -> None:
+    await socket.accept()
+    while True:
+        try:
+            data = await socket.receive_text()
+        except websocket.WebSocketDisconnect:
+            return
+        await socket.send_text(data)
 
 app = Litestar(route_handlers=[PetalsController])
